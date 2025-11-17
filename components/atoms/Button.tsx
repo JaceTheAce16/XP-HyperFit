@@ -7,6 +7,7 @@ import {
   AccessibilityRole,
 } from 'react-native';
 import { colors, typography, touchTarget } from '@/theme';
+import { haptics } from '@/lib/utils/haptics';
 
 interface ButtonProps {
   title: string;
@@ -18,6 +19,7 @@ interface ButtonProps {
   fullWidth?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  hapticFeedback?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -30,7 +32,15 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   accessibilityLabel,
   accessibilityHint,
+  hapticFeedback = true,
 }) => {
+  const handlePress = () => {
+    if (hapticFeedback) {
+      haptics.medium();
+    }
+    onPress();
+  };
+
   const buttonStyles = [
     styles.base,
     styles[variant],
@@ -49,7 +59,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <TouchableOpacity
       style={buttonStyles}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || loading}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}

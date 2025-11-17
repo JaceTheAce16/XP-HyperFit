@@ -9,32 +9,19 @@ export interface Theme {
   isDark: boolean;
 }
 
-export const lightTheme: Theme = {
-  colors: {
-    ...colors,
-    background: colors.light.background,
-    surface: colors.light.surface,
-    surfaceElevated: colors.light.surfaceElevated,
-    border: colors.light.border,
-    text: colors.light.text,
-  },
+// Light and Dark themes for future theme switching
+export const lightTheme = {
+  colors: colors,
   typography,
   spacing: { ...spacing, touchTarget },
   isDark: false,
-};
+} as const;
 
-export const darkTheme: Theme = {
-  colors: {
-    ...colors,
-    background: colors.dark.background,
-    surface: colors.dark.surface,
-    surfaceElevated: colors.dark.surfaceElevated,
-    border: colors.dark.border,
-    text: colors.dark.text,
-  },
+export const darkTheme = {
+  colors: colors,
   typography,
   spacing: { ...spacing, touchTarget },
   isDark: true,
-};
+} as const;
 
 export { colors, typography, spacing, touchTarget };

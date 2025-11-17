@@ -46,7 +46,7 @@ export const ActiveWorkoutCard: React.FC<ActiveWorkoutCardProps> = ({
   };
 
   return (
-    <Card style={[styles.card, isComplete && styles.cardComplete]}>
+    <Card style={[styles.card, isComplete ? styles.cardComplete : undefined]}>
       {/* Exercise Header */}
       <View style={styles.header}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>

@@ -7,10 +7,12 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/atoms/Button';
 import { Card } from '@/components/atoms/Card';
+import { SkeletonList } from '@/components/atoms/SkeletonLoader';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { workoutService } from '@/lib/services/workoutService';
 import { supabase } from '@/lib/supabase';
@@ -26,6 +28,7 @@ export default function WorkoutScreen() {
   const { user } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -33,8 +36,10 @@ export default function WorkoutScreen() {
     }
   }, [user]);
 
-  const loadWorkouts = async () => {
+  const loadWorkouts = async (isRefresh = false) => {
     if (!user) return;
+
+    if (isRefresh) setRefreshing(true);
 
     try {
       const userWorkouts = await workoutService.getUserWorkouts(user.id);
@@ -43,7 +48,12 @@ export default function WorkoutScreen() {
       console.error('Error loading workouts:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    loadWorkouts(true);
   };
 
   const handleStartWorkout = (workoutId: string) => {
@@ -60,9 +70,19 @@ export default function WorkoutScreen() {
         <Text style={styles.subtitle}>Choose a workout to begin</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary.main}
+            colors={[colors.primary.main]}
+          />
+        }
+      >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary.main} style={styles.loader} />
+          <SkeletonList count={3} type="workout" />
         ) : workouts.length === 0 ? (
           <Card style={styles.emptyCard}>
             <Text style={styles.emptyText}>No workouts yet</Text>

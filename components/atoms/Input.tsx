@@ -35,8 +35,8 @@ export const Input: React.FC<InputProps> = ({
       <TextInput
         style={[
           styles.input,
-          isFocused && styles.inputFocused,
-          error && styles.inputError,
+          isFocused ? styles.inputFocused : undefined,
+          error ? styles.inputError : undefined,
         ]}
         placeholderTextColor={colors.dark.text.disabled}
         onFocus={() => setIsFocused(true)}
@@ -44,7 +44,6 @@ export const Input: React.FC<InputProps> = ({
         accessible={true}
         accessibilityLabel={label}
         accessibilityHint={helperText}
-        accessibilityRequired={required}
         {...props}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}

@@ -11,6 +11,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Button } from '@/components/atoms/Button';
 import { ActiveWorkoutCard } from '@/components/organisms/ActiveWorkoutCard';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useToast } from '@/lib/contexts/ToastContext';
+import { haptics } from '@/lib/utils/haptics';
 import { workoutService } from '@/lib/services/workoutService';
 import { workoutCompletionService } from '@/lib/services/workoutCompletionService';
 import { supabase } from '@/lib/supabase';
@@ -32,6 +34,7 @@ export default function ActiveSessionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [exercises, setExercises] = useState<WorkoutExercise[]>([]);
@@ -86,7 +89,7 @@ export default function ActiveSessionScreen() {
 
     } catch (error) {
       console.error('Error starting workout:', error);
-      Alert.alert('Error', 'Failed to start workout session');
+      showToast('Failed to start workout session', 'error');
       router.back();
     }
   };
@@ -117,9 +120,14 @@ export default function ActiveSessionScreen() {
       // Update total volume
       setTotalVolume(prev => prev + (reps * weight));
 
+      // Success feedback
+      haptics.medium();
+      showToast(`Set ${setNumber} logged!`, 'success', 1500);
+
     } catch (error) {
       console.error('Error adding set:', error);
-      Alert.alert('Error', 'Failed to log set');
+      haptics.error();
+      showToast('Failed to log set', 'error');
     }
   };
 
@@ -147,9 +155,13 @@ export default function ActiveSessionScreen() {
       // Update total volume
       setTotalVolume(prev => prev - (setToRemove.reps * setToRemove.weight));
 
+      haptics.light();
+      showToast('Set removed', 'info', 1500);
+
     } catch (error) {
       console.error('Error removing set:', error);
-      Alert.alert('Error', 'Failed to remove set');
+      haptics.error();
+      showToast('Failed to remove set', 'error');
     }
   };
 
@@ -175,6 +187,9 @@ export default function ActiveSessionScreen() {
         duration
       );
 
+      // Success haptic
+      haptics.success();
+
       // Show completion message
       const message = workoutCompletionService.getCompletionMessage(result);
 
@@ -191,7 +206,8 @@ export default function ActiveSessionScreen() {
 
     } catch (error) {
       console.error('Error completing workout:', error);
-      Alert.alert('Error', 'Failed to complete workout. Your progress is saved.');
+      haptics.error();
+      showToast('Failed to complete workout. Your progress is saved.', 'error');
       setCompleting(false);
     }
   };

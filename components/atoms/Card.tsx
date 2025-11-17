@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { colors, spacing } from '@/theme';
 
 interface CardProps {
   children: React.ReactNode;
   elevated?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   padding?: keyof typeof spacing;
 }
 
@@ -19,7 +19,7 @@ export const Card: React.FC<CardProps> = ({
     <View
       style={[
         styles.card,
-        elevated && styles.elevated,
+        elevated ? styles.elevated : undefined,
         { padding: spacing[padding] },
         style,
       ]}
