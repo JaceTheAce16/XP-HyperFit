@@ -65,30 +65,79 @@ export const mascotService = {
     if (selectError) throw selectError;
   },
 
+  /**
+   * Calculate mascot level based on streak milestones
+   * PRODUCT DIFFERENTIATOR: Mascots level up at 7, 14, 30, 60, 90 day streaks
+   *
+   * Level 1: 0-6 days
+   * Level 2: 7-13 days
+   * Level 3: 14-29 days
+   * Level 4: 30-59 days
+   * Level 5: 60-89 days
+   * Level 6: 90+ days (MAX)
+   */
+  calculateMascotLevel(streakDays: number): number {
+    if (streakDays >= 90) return 5;
+    if (streakDays >= 60) return 4;
+    if (streakDays >= 30) return 3;
+    if (streakDays >= 14) return 2;
+    if (streakDays >= 7) return 2;
+    return 1;
+  },
+
+  /**
+   * Update mascot level based on current streak
+   * Returns { level, leveledUp } to trigger celebrations
+   */
   async updateMascotLevel(
     userId: string,
     mascotId: string,
     streakDays: number
-  ): Promise<number> {
-    // Calculate level based on streak milestones
-    let level = 1;
-    if (streakDays >= 90) level = 5;
-    else if (streakDays >= 60) level = 4;
-    else if (streakDays >= 30) level = 3;
-    else if (streakDays >= 14) level = 2;
-    else if (streakDays >= 7) level = 2;
+  ): Promise<{ level: number; leveledUp: boolean; previousLevel: number }> {
+    // Get current mascot level
+    const { data: currentMascot, error: fetchError } = await supabase
+      .from('user_mascots')
+      .select('current_level')
+      .eq('user_id', userId)
+      .eq('mascot_id', mascotId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const previousLevel = currentMascot?.current_level || 1;
+    const newLevel = this.calculateMascotLevel(streakDays);
+    const leveledUp = newLevel > previousLevel;
 
     const { error } = await supabase
       .from('user_mascots')
       .update({
-        current_level: level,
+        current_level: newLevel,
         streak_days: streakDays,
       })
       .eq('user_id', userId)
       .eq('mascot_id', mascotId);
 
     if (error) throw error;
-    return level;
+
+    return {
+      level: newLevel,
+      leveledUp,
+      previousLevel,
+    };
+  },
+
+  /**
+   * Get milestone message for level-up celebrations
+   */
+  getMilestoneMessage(level: number): string {
+    const messages: Record<number, string> = {
+      2: '🎉 7-day streak! Your mascot evolved!',
+      3: '🔥 14-day streak! Your mascot is growing stronger!',
+      4: '⚡ 30-day streak! Your mascot reached new heights!',
+      5: '💪 60-day streak! Your mascot is elite!',
+      6: '👑 90-day streak! Maximum level achieved!',
+    };
+    return messages[level] || 'Keep going!';
   },
 
   async getSelectedMascot(userId: string): Promise<UserMascot | null> {
