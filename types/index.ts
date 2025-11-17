@@ -11,6 +11,33 @@ export interface User {
   onboarding_completed: boolean;
 }
 
+// Onboarding Types
+export type FitnessGoal =
+  | 'build_muscle'
+  | 'lose_fat'
+  | 'gain_strength'
+  | 'improve_endurance'
+  | 'general_fitness'
+  | 'athletic_performance';
+
+export type WorkoutFrequency = '2-3' | '4-5' | '6-7';
+export type SessionDuration = '30-45' | '45-60' | '60-90' | '90+';
+export type PreferredEquipment = Equipment[];
+
+export interface OnboardingData {
+  experience_level: UserLevel;
+  fitness_goals: FitnessGoal[];
+  workout_frequency: WorkoutFrequency;
+  session_duration: SessionDuration;
+  preferred_equipment: PreferredEquipment;
+  current_injuries?: string;
+  has_gym_access: boolean;
+}
+
+export interface UserProfile extends User {
+  onboarding_data?: OnboardingData;
+}
+
 // Subscription Types
 export type SubscriptionTier = 'free' | 'mid' | 'top';
 
@@ -63,6 +90,7 @@ export interface WorkoutExercise {
   target_reps: number;
   target_weight?: number;
   rest_seconds: number;
+  exercise?: Exercise; // Populated via join
 }
 
 // Workout Session Types
@@ -109,6 +137,7 @@ export interface UserMascot {
   streak_days: number;
   selected: boolean;
   unlocked_at: string;
+  mascots?: Mascot; // Populated via join
 }
 
 // Progress Tracking Types
