@@ -269,6 +269,10 @@ xp-hyperfit/
 
 ## 🛠️ Getting Started
 
+### Quick Links
+- **[Development Build Setup](SETUP.md)** - Build and install on your phone
+- **[Running with Expo Go](#running-with-expo-go)** - Fastest way to test
+
 ### Prerequisites
 - Node.js 18+ and npm
 - Expo CLI: `npm install -g expo-cli`
@@ -316,6 +320,32 @@ xp-hyperfit/
    npm run ios      # iOS Simulator (Mac only)
    npm run android  # Android Emulator
    ```
+
+### Running with Expo Go
+
+For quick testing without building:
+
+1. **Install Expo Go** on your phone (App Store or Google Play)
+2. **Start dev server:**
+   ```bash
+   npm start
+   ```
+3. **Scan QR code** with Expo Go app (Android) or Camera app (iOS)
+
+**Note:** Some native features may not work in Expo Go. For full testing with haptic feedback and all features, use the [Development Build](SETUP.md) instead.
+
+### Building for Your Phone
+
+For the best testing experience with all features (haptic feedback, notifications, etc.), create a development build:
+
+```bash
+# See SETUP.md for detailed instructions
+npm install -g eas-cli
+eas login
+eas build --profile development --platform ios     # or android
+```
+
+Then install on your phone and connect to your dev server. See [SETUP.md](SETUP.md) for complete instructions.
 
 ## 💰 Pricing Tiers
 
